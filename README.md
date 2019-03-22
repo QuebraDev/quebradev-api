@@ -20,9 +20,7 @@ O serviço está como padrão para rodar na porta 3000.
 
 A autenticação é feita por authbasic, para configurar um usuário você precisa exportar as seguintes variaveis de ambiente na sua máquina.
 
-` export USER=quebradev_user `
-
-` export PASSWORD=quebradev_password `
+` export PASS_ADMIN=pass `
 
 ## Certificados
 
@@ -64,5 +62,6 @@ Ao enviar o retorno será um ` 201 ` com os dados criados, inclusive o ` hash ` 
 
 ### GET [/certified/{hashId}]
 
-Para obter um certificado basta passar a ` hash ` do certificado e o JSON retornado terá todas informações deste certificado e do seu dono.
+Para obter um certificado basta passar a ` hash ` do certificado e o JSON retornado terá todas informações deste certificado e do seu dono. Não é necessário 
+passar os dados de Basic Auth nesta chamada.
 
