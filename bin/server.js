@@ -1,3 +1,4 @@
+require('dotenv').config()
 const app = require('../src/app');
 const port = normalizaPort(process.env.PORT || '3000');
 

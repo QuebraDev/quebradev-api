@@ -1,3 +1,4 @@
+const certificateService = require('../services/certificateService');
 const certificates = require('../models/certificates');
 
 exports.get = (req, res, next) => {
