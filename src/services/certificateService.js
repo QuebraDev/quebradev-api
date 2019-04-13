@@ -1,3 +1,3 @@
-const awsService = require('./services/awsService');
+const awsService = require('./awsService');
 const jimp = require('jimp');
 
