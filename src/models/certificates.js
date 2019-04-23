@@ -6,18 +6,24 @@ const Certificate = new Schema({
     name: { type: String, required: true },
     birthday: Date,
     documents: {
-        rg: { type: String, required: true, unique: true },
-        cpf: { type: String, unique: true },
+        rg: { type: String, required: true, unique: true }
     },
     period: {
         totalHours: { type: String, required: true },
-        start: { type: Date, required: true },
-        end: { type: Date, required: true },
+        dates: [
+            {
+                date: { type: Date, required: true }
+            }
+        ],
     },
     course: {
         name: { type: String, required: true },
         type: { type: String, enum: ['WorkShop', 'BootCamp'] },
-        teacher: { type: String, required: true },
+        teachers: [
+            {
+                name: { type: String, required: true, enum: ['Miguel', 'Willian']}
+            }
+        ],
     },
     location: {
         name: { type: String, required: true },
@@ -30,6 +36,7 @@ const Certificate = new Schema({
         responsible: { type: String, required: true },
     },
     updated: { type: Date, default: Date.now() },
+    imageUrl: { type: String, default: 's3' },
     hash: {
         type: Number,
         default : function() {
