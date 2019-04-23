@@ -13,9 +13,17 @@ exports.get = (req, res, next) => {
     })
 };
 
-exports.post = async (req, res, next) => {
-    certificates.create(req.body).then((result) => {        
-        res.status(201).json(result);
+exports.post = (req, res, next) => {
+    certificates.create(req.body).then(async (result) => {     
+        await certificateService.createCertificate(req.body, result.hash).then(certificate => {
+            certificateService.uploadCertificate(result.hash).then(upload => {
+                certificates.findOneAndUpdate(
+                    { hash: result.hash },
+                    { imageUrl: upload.Location },
+                    { new: true },
+                    (error, newCertificate) => res.status(201).json(newCertificate));
+            });
+        });
     }).catch((error) => {
         res.status(400).json(error);
     });
