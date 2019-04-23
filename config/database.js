@@ -5,7 +5,7 @@ const MONGO_USER = process.env.MONGO_USER
 const MONGO_PASS = process.env.MONGO_PASS
 
 const mongoose = require('mongoose');
-const strConnectionMongo = `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}/${MONGO_DB}`;
+const strConnectionMongo = `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
 
 mongoose.connect(strConnectionMongo, { useNewUrlParser: true });
 
