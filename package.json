@@ -4,15 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon ./bin/server.js",
     "start": "node ./bin/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.441.0",
     "body-parser": "^1.18.3",
+    "canvas": "^2.4.1",
+    "dotenv": "^7.0.0",
     "express": "^4.16.4",
-    "express-basic-auth": "^1.1.6",
-    "mongoose": "^5.4.19"
+    "express-basic-auth": "^1.2.0",
+    "jimp": "^0.6.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
   }
 }
