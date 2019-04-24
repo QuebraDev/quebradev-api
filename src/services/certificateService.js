@@ -111,7 +111,7 @@ const uploadCertificate = (hash) => {
             ACL: 'public-read'
         }, function(error, data) {
             if (error) return console.log('Upload error: ', err.message);
-            fs.unlink(certificatePath)
+            fs.unlink(certificatePath, () => console.log('Certificado emitido.'));
             resolve(data);
         });
     })
