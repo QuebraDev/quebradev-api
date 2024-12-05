@@ -6,7 +6,10 @@ const Certificate = new Schema({
     name: { type: String, required: true },
     birthday: Date,
     documents: {
-        rg: { type: String, required: true, unique: true }
+        rg: { type: String, unique: true }
+    },
+    type: {
+        name: { type: String, required: true, enum: ["teacher", "student", "speaker", "author"]}
     },
     period: {
         totalHours: { type: String, required: true },
@@ -18,10 +21,11 @@ const Certificate = new Schema({
     },
     course: {
         name: { type: String, required: true },
-        type: { type: String, enum: ['WorkShop', 'BootCamp'] },
-        teachers: [
+        type: { type: String },
+        title: { type: String },
+        responsibles: [
             {
-                name: { type: String, required: true, enum: ['Miguel', 'Willian']}
+                name: { type: String, required: true}
             }
         ],
     },
