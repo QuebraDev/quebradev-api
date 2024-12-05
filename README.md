@@ -6,11 +6,29 @@ URL do serviço online: `http://`
 
 # Rodando
 
-Para rodar este projeto, é simples. Baixe-o e rode os seguintes comandos.
+Para rodar este projeto voce precisa do node e yarn instalado em sua máquina, além do Docker e Docker Compose. Baixe-os e em seguida rode os seguintes comandos.
 
-` npm i `
+` docker-compose up -d localstack mongo `
 
-` npm run dev `
+Para rodar os buckets local voce precisa ter instalado o `awslocal` e então executar os seguintes comandos:
+
+`awslocal s3 mb s3://certificados`
+`awslocal s3 mb s3://certificados/bases`
+`awslocal s3 mb s3://certificados/certificados`
+
+O comando a seguir sobe a base de fundo do certificado, caso voce queira adicionar outra base deve modificar esse arquivo:
+
+`awslocal s3 cp src/images/certificado-base.png s3://certificados/bases/certificado-base.png`
+
+E o upload abaixo copia seu arquivo de assinatura para a base, para cada responsável ou professor que irá assinar os certificados eles precisam conter o arquivo no s3 com o seguinte padrão `{nome}-assinatura.png` onde nome é o nome do responsável.
+
+`awslocal s3 cp src/images/teste-assinatura.png s3://certificados/bases/teste-assinatura.png`
+
+E então executar o código da aplicação
+
+` yarn install `
+
+` yarn run dev `
 
 O serviço está como padrão para rodar na porta 3000.
 
@@ -21,6 +39,8 @@ O serviço está como padrão para rodar na porta 3000.
 A autenticação é feita por authbasic, para configurar um usuário você precisa exportar as seguintes variaveis de ambiente na sua máquina.
 
 ` export PASS_ADMIN=pass `
+
+O username é `admin`
 
 ## Certificados
 
@@ -34,6 +54,9 @@ Para criar um novo certificado utilize o método de autenticação basic e envie
         "documents": {
             "rg": "11111111111"
         },
+        "type": {
+            "name": "student" # ou teacher, speaker, author
+        },
         "period": {
             "totalHours": "12",
             "dates": [
@@ -46,7 +69,7 @@ Para criar um novo certificado utilize o método de autenticação basic e envie
         "course": {
             "name": "Workshop de Desenvolvimento Web",
             "type": "WorkShop",
-            "teachers": [
+            "responsibles": [
                 {"name": "Miguel"},
                 {"name": "Willian"}
             ]
