@@ -11,15 +11,19 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.1692.0",
+    "@aws-sdk/client-s3": "^3.705.0",
+    "@aws-sdk/credential-providers": "^3.699.0",
+    "@aws-sdk/s3-request-presigner": "^3.705.0",
     "body-parser": "^1.18.3",
     "canvas": "^2.4.1",
+    "crypto": "^1.0.1",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "express-basic-auth": "^1.2.0",
     "jimp": "^0.6.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.5.3"
+    "mongoose": "^5.5.3",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "nodemon": "^1.18.11"
