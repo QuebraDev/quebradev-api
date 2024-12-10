@@ -65,7 +65,7 @@ const buildCertificateToAuthorOrSpeaker = (canvasContext, canvasImage, canvas, c
     canvasContext.fillStyle = 'black';
     canvasContext.textAlign = 'left';
 
-    canvasContext.font = '45px Arial'
+    canvasContext.font = '32px Arial'
     
     if (certificate.type.name == "author") {
         canvasContext.fillText(`Certificamos que ${certificate.name} participou como pessoa autora de artigo`, 240, 420)
@@ -79,8 +79,9 @@ const buildCertificateToAuthorOrSpeaker = (canvasContext, canvasImage, canvas, c
     canvasContext.fillText(`Carga Horária: ${certificate.period.totalHours} horas.`, 240, 760)
 
     canvasContext.font = '16px Arial'
-    canvasContext.fillText(`Nº do Certificado: ${hash}`, 150, 1010)
-    canvasContext.fillText(`URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1030)
+    canvasContext.fillText(`CNPJ: ASSOCIACAO QUEBRADEV - 55.442.661/0001-69`, 150, 1010)
+    canvasContext.fillText(`Nº do Certificado: ${hash}`, 150, 1030)
+    canvasContext.fillText(`URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1050)
 
     return canvasContext;
 }
@@ -98,11 +99,12 @@ const buildCertificateToStudent = (canvasContext, canvasImage, canvas, certifica
     canvasContext.fillText(`Carga Horária: ${certificate.period.totalHours} horas.`, 240, 650)
 
     canvasContext.font = '30px Arial'
-    canvasContext.fillText('Ministrado por:', 240, 760)
+    canvasContext.fillText(`Ministrado por: ${certificate.responsibles[0].name}`, 240, 760)
 
     canvasContext.font = '16px Arial'
-    canvasContext.fillText(`Nº do Certificado: ${hash}`, 150, 1010)
-    canvasContext.fillText(`URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1030)
+    canvasContext.fillText(`CNPJ: ASSOCIACAO QUEBRADEV - 55.442.661/0001-69`, 150, 1010)
+    canvasContext.fillText(`Nº do Certificado: ${hash}`, 150, 1030)
+    canvasContext.fillText(`URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1050)
 
     return canvasContext;
 }
@@ -136,7 +138,7 @@ const addSignatureToCertificate = async (certificateCanvas, responsibles) => {
                     return;
                 }
 
-                const canvas = Canvas.createCanvas(300, 70);
+                const canvas = Canvas.createCanvas(250, 50);
                 const canvasContext = canvas.getContext('2d');
                 const canvasImage = new Canvas.Image();
 
