@@ -1,0 +1,48 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      AWS_INSTANCE_SG_ID: ${{ secrets.AWS_INSTANCE_SG_ID }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Get Runner IP Address
+        id: ip
+        uses: haythem/public-ip@v1.2
+      - name: Add IP to security group ingress
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id $AWS_INSTANCE_SG_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      - name: Execute SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd quebradev-api \
+              && ./bin/rolling-update.sh
+      - name: Remove IP from security group
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id $AWS_INSTANCE_SG_ID \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+

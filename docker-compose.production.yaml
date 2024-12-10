@@ -1,0 +1,50 @@
+services:
+  api:
+    build: .
+    command: npm run start
+    environment:
+      BASIC_AUTH_PASSWORD: ${BASIC_AUTH_PASSWORD:-}
+      MONGODB_URI: mongodb://root:password@mongo
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_BUCKET_NAME: certificados-quebradev
+      AWS_ENDPOINT: http://s3.amazonaws.com
+    depends_on:
+      - mongo
+    volumes:
+      - /home/node/app/node_modules
+      - ./:/home/node/app
+
+  mongo:
+    image: mongo
+    container_name: quebradev-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb:/data/db
+
+  nginx:
+    image: nginx:1.15-alpine
+    container_name: quebradev-nginx
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: quebradev-certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
+volumes:
+  mongodb:

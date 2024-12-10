@@ -17,40 +17,45 @@ const s3Client = new S3({
 const createCertificate = async (certificate, hash) => {    
     const params = { Bucket: process.env.AWS_BUCKET_NAME, Key: 'bases/certificado-base.png',  };
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         s3Client.getObject(params, async (error, data) => {
             if (error) {
                 reject(error);
                 return;
             }
-            
-            const canvas = Canvas.createCanvas(1600, 1194);
-            let canvasContext = canvas.getContext('2d');
-            const canvasImage = new Canvas.Image();
-            const courseDates = getCourseDates(certificate.period.dates);
 
-            canvasImage.src = Buffer.from(await data.Body.transformToByteArray());
-            
-            if (certificate.type.name == "student") {
-                buildCertificateToStudent(canvasContext, canvasImage, canvas, certificate, hash, courseDates);
-                canvasContext = await addSignatureToCertificate(canvasContext, certificate.course.responsibles);
-            }
+            try {
+                const canvas = Canvas.createCanvas(1600, 1194);
+                let canvasContext = canvas.getContext('2d');
+                const canvasImage = new Canvas.Image();
+                const courseDates = getCourseDates(certificate.period.dates);
 
-            if (certificate.type.name == "author" || certificate.type.name == "speaker") {
-                buildCertificateToAuthorOrSpeaker(
-                    canvasContext, canvasImage, canvas, 
-                    certificate, hash, courseDates
-                );
-                canvasContext = await addSignatureToCertificate(canvasContext, certificate.course.responsibles);
-            }
+                canvasImage.src = Buffer.from(await data.Body.transformToByteArray());
 
-            if (certificate.type.name == "teacher") {
-                // todo
+                if (certificate.type.name == "student") {
+                    buildCertificateToStudent(canvasContext, canvasImage, canvas, certificate, hash, courseDates);
+                    canvasContext = await addSignatureToCertificate(canvasContext, certificate.course.responsibles);
+                }
+
+                if (certificate.type.name == "author" || certificate.type.name == "speaker") {
+                    buildCertificateToAuthorOrSpeaker(
+                        canvasContext, canvasImage, canvas,
+                        certificate, hash, courseDates
+                    );
+                    canvasContext = await addSignatureToCertificate(canvasContext, certificate.course.responsibles);
+                }
+
+                if (certificate.type.name == "teacher") {
+                    // todo
+                }
+
+                const certificateOut = fs.createWriteStream(path.join(__dirname, `/../images/${hash}.png`));
+                canvas.createPNGStream().pipe(certificateOut);
+                certificateOut.on('finish', () => resolve(true));
+            } catch (e) {
+                console.error(e);
+                reject(e.message);
             }
-            
-            const certificateOut = fs.createWriteStream(path.join(__dirname, `/../images/${hash}.png`));
-            canvas.createPNGStream().pipe(certificateOut);
-            certificateOut.on('finish', () => resolve(true));
         })
     });
 }
@@ -161,17 +166,22 @@ const addSignatureToCertificate = async (certificateCanvas, responsibles) => {
 const uploadCertificate = (hash) => {
     const certificatePath = path.join(__dirname, `/../images/${hash}.png`);
 
-    return new Promise((resolve) => {
-        s3Client.putObject({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: `certificados/${hash}.png`,
-            Body: fs.readFileSync(certificatePath),
-        }, async function(error, data) {
-            if (error) return console.log('Upload error: ', err.message);
-            fs.unlink(certificatePath, () => console.log('Certificado emitido.'));
+    return new Promise((resolve, reject) => {
+        try {
+            s3Client.putObject({
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: `certificados/${hash}.png`,
+                Body: fs.readFileSync(certificatePath),
+            }, async function(error, data) {
+                if (error) return console.log('Upload error: ', err.message);
+                fs.unlink(certificatePath, () => console.log('Certificado emitido.'));
 
-            resolve(await getCertificateImageSignedUrl(hash));
-        });
+                resolve(await getCertificateImageSignedUrl(hash));
+            });
+        } catch (e) {
+            console.error(e);
+            reject(e.message)
+        }
     })
 }
 

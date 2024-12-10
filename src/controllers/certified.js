@@ -27,6 +27,6 @@ exports.post = (req, res, next) => {
             });
         });
     }).catch((error) => {
-        res.status(400).json(error);
+        res.status(400).json({"error": error});
     });
 }
