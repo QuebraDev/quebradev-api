@@ -5,7 +5,7 @@ const basicAuth = require('express-basic-auth');
 
 router.post('/', basicAuth({
     users: {
-        admin: process.env.PASS_ADMIN || 'quebradev_password'
+        admin: process.env.BASIC_AUTH_PASSWORD || 'quebradev_password'
     }
 }), controller.post);
 

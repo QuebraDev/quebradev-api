@@ -1,0 +1,49 @@
+services:
+  api:
+    build: .
+    container_name: quebradev-api
+    ports:
+      - "3000:3000"
+    environment:
+      BASIC_AUTH_PASSWORD: password
+      MONGODB_URI: mongodb://root:password@mongo
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: access-key
+      AWS_SECRET_ACCESS_KEY: access-key-secret
+      AWS_ENDPOINT: http://localstack:4566
+      AWS_BUCKET_NAME: certificados
+    depends_on:
+      - mongo
+      - localstack
+    volumes:
+      - /home/node/app/node_modules
+      - ./:/home/node/app
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: quebradev-localstack
+    ports:
+      - "4566:4566"  # Porta LocalStack
+      - "4572:4572"  # Porta S3
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: access-key
+      AWS_SECRET_ACCESS_KEY: access-key-secret
+    volumes:
+      - /tmp/localstack:/var/lib/localstack
+
+  mongo:
+    image: mongo
+    container_name: quebradev-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+
+volumes:
+  mongodb:

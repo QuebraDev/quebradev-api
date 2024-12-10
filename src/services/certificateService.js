@@ -1,32 +1,26 @@
-const AWS = require('aws-sdk');
+const { S3, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { fromEnv } = require("@aws-sdk/credential-providers");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const fs = require('fs');
 const path = require('path');
 const Canvas = require('canvas');
 const moment = require('moment');
 
-AWS.config.update({
-    region: process.env.REGION,
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
-    endpoint: process.env.AWS_ENDPOINT
-});
-
 Canvas.registerFont(__dirname + '/../images/ubuntu.ttf', { family: 'ubuntu' });
 
-const s3Client = new AWS.S3({
-    endpoint: process.env.AWS_ENDPOINT,
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
-    s3ForcePathStyle: true
+const s3Client = new S3({
+   credentials: fromEnv(),
+   forcePathStyle: true,
+   endpoint: process.env.AWS_ENDPOINT,
 });
 
 const createCertificate = async (certificate, hash) => {    
-    const params = { Bucket: process.env.BUCKET_NAME, Key: 'bases/certificado-base.png',  };
+    const params = { Bucket: process.env.AWS_BUCKET_NAME, Key: 'bases/certificado-base.png',  };
 
     return new Promise((resolve) => {
         s3Client.getObject(params, async (error, data) => {
             if (error) {
-                console.log(error.message);
+                reject(error);
                 return;
             }
             
@@ -35,7 +29,7 @@ const createCertificate = async (certificate, hash) => {
             const canvasImage = new Canvas.Image();
             const courseDates = getCourseDates(certificate.period.dates);
 
-            canvasImage.src = data.Body;
+            canvasImage.src = Buffer.from(await data.Body.transformToByteArray());
             
             if (certificate.type.name == "student") {
                 buildCertificateToStudent(canvasContext, canvasImage, canvas, certificate, hash, courseDates);
@@ -127,7 +121,7 @@ const getCourseDates = (dates) => {
 }
 
 const addSignatureToCertificate = async (certificateCanvas, responsibles) => {
-    const params = { Bucket: process.env.BUCKET_NAME, Key: '' };
+    const params = { Bucket: process.env.AWS_BUCKET_NAME, Key: '' };
     let signaturePositionX = 240;
 
     responsibles = responsibles.map((responsible) => responsible.name.split(' ')[0].toLowerCase()).sort();
@@ -136,7 +130,7 @@ const addSignatureToCertificate = async (certificateCanvas, responsibles) => {
         params.Key = `bases/${responsible}-assinatura.png`;
 
         await new Promise((resolve) => {
-            s3Client.getObject(params, (error, data) => {
+            s3Client.getObject(params, async (error, data) => {
                 if (error) {
                     resolve(true);
                     return;
@@ -146,7 +140,7 @@ const addSignatureToCertificate = async (certificateCanvas, responsibles) => {
                 const canvasContext = canvas.getContext('2d');
                 const canvasImage = new Canvas.Image();
 
-                canvasImage.src = data.Body;
+                canvasImage.src = Buffer.from(await data.Body.transformToByteArray());
 
                 canvasContext.clearRect(0, 0);
                 canvasContext.drawImage(canvasImage, 0, 0);
@@ -166,20 +160,30 @@ const uploadCertificate = (hash) => {
     const certificatePath = path.join(__dirname, `/../images/${hash}.png`);
 
     return new Promise((resolve) => {
-        s3Client.upload({
-            Bucket: process.env.BUCKET_NAME,
+        s3Client.putObject({
+            Bucket: process.env.AWS_BUCKET_NAME,
             Key: `certificados/${hash}.png`,
             Body: fs.readFileSync(certificatePath),
-            ACL: 'public-read'
-        }, function(error, data) {
+        }, async function(error, data) {
             if (error) return console.log('Upload error: ', err.message);
             fs.unlink(certificatePath, () => console.log('Certificado emitido.'));
-            resolve(data);
+
+            resolve(await getCertificateImageSignedUrl(hash));
         });
     })
 }
 
+const getCertificateImageSignedUrl = async (hash) => {
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `certificados/${hash}.png`,
+    });
+
+    return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+};
+
 module.exports = {
     createCertificate,
-    uploadCertificate
+    uploadCertificate,
+    getCertificateImageSignedUrl
 }
