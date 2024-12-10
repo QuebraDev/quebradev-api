@@ -74,14 +74,15 @@ const buildCertificateToAuthorOrSpeaker = (canvasContext, canvasImage, canvas, c
     
     if (certificate.type.name == "author") {
         canvasContext.fillText(`Certificamos que ${certificate.name} participou como pessoa autora de artigo`, 240, 420)
+        canvasContext.fillText(`com o artigo de titulo:`, 240, 475)
     } else {
         canvasContext.fillText(`Certificamos que ${certificate.name} participou como pessoa palestrante`, 240, 420)
+        canvasContext.fillText(`com a palestra de titulo:`, 240, 475)
     }
     
-    canvasContext.fillText(`do ${certificate.course.name} do QuebraDev,`, 240, 475)
-    canvasContext.fillText(`ministrando ${certificate.course.title},`, 240, 530)
-    canvasContext.fillText(`realizado nos dias ${courseDates}`, 240, 650)
-    canvasContext.fillText(`Carga Horária: ${certificate.period.totalHours} horas.`, 240, 760)
+    canvasContext.fillText(`${certificate.course.title},`, 240, 530)
+    canvasContext.fillText(`em ${certificate.course.name}`, 240, 650)
+    canvasContext.fillText(`realizado nos dias ${courseDates}`, 240, 760)
 
     canvasContext.font = '16px Arial'
     canvasContext.fillText(`CNPJ: ASSOCIACAO QUEBRADEV - 55.442.661/0001-69`, 150, 1010)
