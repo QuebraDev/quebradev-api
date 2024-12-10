@@ -99,7 +99,7 @@ const buildCertificateToStudent = (canvasContext, canvasImage, canvas, certifica
     canvasContext.fillText(`Carga Horária: ${certificate.period.totalHours} horas.`, 240, 650)
 
     canvasContext.font = '30px Arial'
-    canvasContext.fillText(`Ministrado por: ${certificate.responsibles[0].name}`, 240, 760)
+    canvasContext.fillText(`Ministrado por: ${certificate.course.responsibles[0].name}`, 240, 760)
 
     canvasContext.font = '16px Arial'
     canvasContext.fillText(`CNPJ: ASSOCIACAO QUEBRADEV - 55.442.661/0001-69`, 150, 1010)
