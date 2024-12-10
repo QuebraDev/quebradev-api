@@ -81,13 +81,12 @@ const buildCertificateToAuthorOrSpeaker = (canvasContext, canvasImage, canvas, c
     }
     
     canvasContext.fillText(`${certificate.course.title},`, 240, 530)
-    canvasContext.fillText(`em ${certificate.course.name}`, 240, 650)
-    canvasContext.fillText(`realizado nos dias ${courseDates}`, 240, 760)
+    canvasContext.fillText(`em ${certificate.course.name}`, 240, 580)
+    canvasContext.fillText(`realizado nos dias ${courseDates}`, 240, 630)
 
     canvasContext.font = '16px Arial'
     canvasContext.fillText(`CNPJ: ASSOCIACAO QUEBRADEV - 55.442.661/0001-69`, 150, 1010)
-    canvasContext.fillText(`Nº do Certificado: ${hash}`, 150, 1030)
-    canvasContext.fillText(`URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1050)
+    canvasContext.fillText(`Nº do Certificado: ${hash} - URL do Certificado na Web: http://quebradev.com.br/certificados/${hash}`, 150, 1030)
 
     return canvasContext;
 }
