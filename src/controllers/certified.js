@@ -6,7 +6,9 @@ exports.get = (req, res, next) => {
         res.status(400).json({"error": "Not found information hashId"});
     }
 
-    certificates.find({ hash: req.params.hashId }).then((result) => {
+    certificates.findOne({ hash: req.params.hashId }).then(async (result) => {
+        result["imageUrl"] = await certificateService.getCertificateImageSignedUrl(req.params.hashId);
+
         res.status(200).json(result);
     }).catch((error) => {
         res.status(404).json(error);
@@ -16,10 +18,10 @@ exports.get = (req, res, next) => {
 exports.post = (req, res, next) => {
     certificates.create(req.body).then(async (result) => {     
         await certificateService.createCertificate(req.body, result.hash).then(certificate => {
-            certificateService.uploadCertificate(result.hash).then(upload => {
+            certificateService.uploadCertificate(result.hash).then(signedUrl => {
                 certificates.findOneAndUpdate(
                     { hash: result.hash },
-                    { imageUrl: upload.Location },
+                    { imageUrl: signedUrl },
                     { new: true },
                     (error, newCertificate) => res.status(201).json(newCertificate));
             });
