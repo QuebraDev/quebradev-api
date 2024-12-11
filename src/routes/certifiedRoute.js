@@ -10,7 +10,7 @@ router.post('/', basicAuth({
 }), controller.post);
 
 router.get('/:hashId', controller.get);
-router.get('/:hashId', controller.getValidHash);
-router.get('/:rg', controller.getCertifiedByRG);
+router.get('/valid/:hashId', controller.getValidHash);
+router.get('/valid/:rg', controller.getCertifiedByRG);
 
 module.exports = router;
