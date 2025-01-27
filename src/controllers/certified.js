@@ -22,7 +22,7 @@ exports.getValidHash = (req, res, next) => {
     }
 
     certificates.findOne({ hash: req.params.hashId }).then(async (result) => {
-        res.status(200).json({"certified_valid": true});
+        res.status(200).json({ certified_valid: !!result });
     }).catch((error) => {
         res.status(404).json(error);
     })
@@ -36,7 +36,7 @@ exports.getCertifiedByRG = (req, res, next) => {
     let rgCripted = createHash("sha256").update(req.params.rg).digest("hex")
 
     certificates.findOne({ documents: { rg: rgCripted } }).then(async (result) => {
-        res.status(200).json({"certified_valid": true});
+        res.status(200).json({ certified_valid: !!result });
     }).catch((error) => {
         res.status(404).json(error);
     })
